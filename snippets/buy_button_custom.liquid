@@ -1,0 +1,16 @@
+<div class="button-buy-custom">
+  {% if product.title contains 'Soft Winter Jacket' %}
+    Soft winter Jacket is only avaialable with specific variant of
+    <a href="/products/black-leather-bag?variant=45385506849058">Leather Bag</a>
+
+    <p>This condition can be utilized to hide a product on the product page.</p>
+  {% else %}
+    <button
+      class="buy-btn-custom "
+      {% if product.selected_or_first_available_variant.title contains "Unselected" %}disabled{% endif %}
+      {% unless product.selected_or_first_available_variant.title contains 'Unselected' %}data-id="{{ product.selected_or_first_available_variant.id }}"{% endunless %}>
+      Add To Cart
+    </button>
+    <p>Please Select Size</p>
+  {% endif %}
+</div>
