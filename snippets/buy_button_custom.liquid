@@ -1,12 +1,16 @@
 <div class="button-buy-custom">
+  {% comment %} additonal condition for user to avoid purchase as single item  {% endcomment %}
   {% if product.title contains 'Soft Winter Jacket' %}
+    <p>This condition can be utilized to hide a product on the product page.</p>
+    Soft winter Jacket is not available as single Item.
     Soft winter Jacket is only avaialable with specific variant of
     <a href="/products/black-leather-bag?variant=45385506849058">Leather Bag</a>
 
-    <p>This condition can be utilized to hide a product on the product page.</p>
   {% else %}
+
+    {% comment %} custom Add to cart button {% endcomment %}
     <button
-      class="buy-btn-custom "
+      class="custom_buy_button "
       {% if product.selected_or_first_available_variant.title contains "Unselected" %}disabled{% endif %}
       {% unless product.selected_or_first_available_variant.title contains 'Unselected' %}data-id="{{ product.selected_or_first_available_variant.id }}"{% endunless %}>
       Add To Cart

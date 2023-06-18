@@ -198,7 +198,7 @@
         {%- endif -%}
       </media-gallery>
     </div>
-    <div class="product__info-wrapper grid__item{% if settings.page_width > 1400 and section.settings.media_size == "small" %} product__info-wrapper--extra-padding{% endif %}">
+    <div class="product__info-wrapper  grid__item{% if settings.page_width > 1400 and section.settings.media_size == "small" %} product__info-wrapper--extra-padding{% endif %}">
       <div id="ProductInfo-{{ section.id }}" class="product__info-container{% if section.settings.enable_sticky_info %} product__info-container--sticky{% endif %}">
         {%- assign product_form_id = 'product-form-' | append: section.id -%}
 
@@ -696,6 +696,7 @@
                     let activeImage = slide.getAttribute('data-image-url');
                   
                     console.log(activeImage);
+                  //  compareing variant image with slider image url
                     if ( activevarImage === activeImage ) {
                       
                       slide.style.display = 'block';
@@ -706,13 +707,13 @@
                     }
                 });
               }
-              console.log(activeVarTitle);
+            //  console.log(activeVarTitle);
               if (activeVarTitle.includes('Unselected')) {
               } else {
                   let varId = activeLi.getAttribute('data-var-id');
                 
-                  document.querySelector("button.buy-btn-custom").setAttribute("data-id",varId);
-                  document.querySelector("button.buy-btn-custom").removeAttribute("disabled");
+                  document.querySelector("button.custom_buy_button").setAttribute("data-id",varId);
+                  document.querySelector("button.custom_buy_button").removeAttribute("disabled");
                   window.history.replaceState(null, null, `?variant=${varId}`);
               }
           }
@@ -723,38 +724,76 @@
   document.querySelectorAll('.product-options-selctor input , .product-options-selctor select').forEach(item => {
     VariantCheck(item)
   })
- 
-  if(document.querySelector("button.buy-btn-custom")){
-    document.querySelector("button.buy-btn-custom").addEventListener("click",function(){
-      let variantId = this.getAttribute("data-id");
-      let quantity = document.querySelector(".quantity__input").value;
-      if(variantId){
-        
-        let formData ={
-          'items' :[{
-            'id' : variantId,
-            'quantity': quantity
-          }]
-        };
-        fetch(window.Shopify.routes.root + 'cart/add.json' , {
-          method : 'POST',
-          headers : {
-            'Content-Type' : 'application/json'
 
-          },
-          body: JSON.stringify(formData)
-        })
-        .then(Response => {
-          window.location.href = "/cart"
-          return Response.json();
-        })
-        .catch((error) =>{
-        console.error("Error: " , error);
-        });
-        
+  //adding product to cart  with the purchase of specific Variant of Handbag product
+  if (document.querySelector("button.custom_buy_button")) {
+    document.querySelector("button.custom_buy_button").addEventListener("click",function() {
+      let varId = this.getAttribute("data-id");
+      let quantity = document.querySelector(".quantity__input").value;
+      console.log(varId)
+      if (varId) {
+        console.log(varId)
+        let formData = '';
+
+        //checking if the product variant ID is matched with our specific variant
+      if (varId === "45385506849058") {
+           formData = {
+             'items': [{
+              'id': varId,
+              'quantity': quantity,
+                 'properties' : {
+                  'Gift': 'Free Soft Winter Jacket'
+                }
+              }]
+            };               
+          let formData_gift = {
+               'updates': {
+                  '45377565524258': 1,
+                  '45385506849058': quantity
+                }
+              };
+              fetch(window.Shopify.routes.root + 'cart/update.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData_gift)
+              })
+              .then(response => {
+                window.location.href = "/cart"
+                return response.json();
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+            });
+        } else {
+           formData = {
+             'items': [{
+              'id': varId,
+              'quantity': quantity
+              }]
+            };
+            
+            fetch(window.Shopify.routes.root + 'cart/add.json', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+            })
+            .then(response => {
+              window.location.href = "/cart"
+              return response.json();
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+          });
+        }
+          
       }
     })
-  }
+    }
+ 
  
 </script>
 
