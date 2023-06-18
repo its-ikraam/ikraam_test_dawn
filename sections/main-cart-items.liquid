@@ -17,6 +17,8 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  .cart-item[data-item="Soft Winter Jacket"] quantity-input.quantity{display:none;}
 {%- endstyle -%}
 
 {%- unless settings.cart_type == 'drawer' -%}
@@ -60,7 +62,7 @@
 
             <tbody>
               {%- for item in cart.items -%}
-                <tr class="cart-item" id="CartItem-{{ item.index | plus: 1 }}">
+                <tr class="cart-item" data-item="{{item.title}}" id="CartItem-{{ item.index | plus: 1 }}">
                   <td class="cart-item__media">
                     {% if item.image %}
                       {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
@@ -296,7 +298,75 @@
     <p class="visually-hidden" id="shopping-cart-line-item-status" aria-live="polite" aria-hidden="true" role="status">{{ 'accessibility.loading' | t }}</p>
   </form>
 </cart-items>
+<script>
+  function renderSection(){
+    fetch(window.location.pathname + "?sections=main-cart-items")
+    .then(res => res.json())
+    .then((data)=>{
+      let section = data['main-cart-items'];
+      parser = new DOMParser();
+      var doc = parser.parseFromString(section, "text/html");
+      var cartItems = doc.querySelector("cart-items.page-width").innerHTML;
+    })
+  }
+  function remove(){
+    renderSection()
+    document.querySelector(".cart-item[data-item='Soft Winter Jacket'] a.button").click();
+  }
+  const chkRemove = setInterval(function(){
+        let btnRemove = document.querySelectorAll(".cart-item[data-item='Handbag - Black / Medium'] a.button");
+        let toBeRemove = document.querySelectorAll(".cart-item[data-item='Soft Winter Jacket'] a.button");
+        if(btnRemove.length){
+          if(toBeRemove.length){
+            btnRemove[0].addEventListener("click",function(){
+              setTimeout(function(){
+                // removing gift product 
+              let formData ={
+                'updates':{
+                  '45377565524258': 0
+                }
+              };
+              fetch(window.Shopify.routes.root + 'cart/update.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+              })
+              .then(response =>{
+                const itemChk = setInterval(function(){
+                  let item=document.querySelectorAll(".cart-item[data-item='Soft Winter Jacket']");
+                  if (item.length){
+                    item[0].style.display= 'none';
+                    fetch("/cart.json")
+                    .then((data)=>{
+                      return data.json();
 
+                    }).then((res)=>{
+                      let count = res.item_count;
+                      if(count===0){
+                        document.querySelector(".cart__warnings").style.display ='block';
+                        document.querySelector(".h1.cart__empty-text").style.display ='block';
+                        document.querySelector("#cart-icon-bubble").style.display ='none';
+
+                      }
+                    })
+                    clearInterval(itemChk)
+                  }
+                },500)
+                return response.json();
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+            });
+              },1000)
+            })
+            clearInterval(chkRemove);
+          }
+        }
+
+  },500)
+</script>
 {% schema %}
 {
   "name": "t:sections.main-cart-items.name",
