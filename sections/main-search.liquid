@@ -206,7 +206,7 @@
                     {%- assign lazy_load = true -%}
                   {%- endif -%}
 
-                  <li class="grid__item">
+                  <li class="grid__item tt" {% if item.object_type == 'product' %} {% if item.title == 'Soft Winter Jacket' %} style="display:none;" {% endif %}{% endif %}>
                     {%- case item.object_type -%}
                       {%- when 'product' -%}
                         {%- capture product_settings -%}{%- if section.settings.product_show_vendor -%}vendor,{%- endif -%}title,price{%- endcapture -%}
