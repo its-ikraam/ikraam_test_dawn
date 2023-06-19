@@ -359,6 +359,10 @@
                 },500)
                 return response.json();
               })
+              .then(response => {
+                window.location.href = "/cart"
+                return response.json();
+              })
               .catch((error) => {
                 console.error('Error:', error);
             });
